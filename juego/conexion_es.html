@@ -626,6 +626,7 @@
                 // Publicar datos con el prefijo
                 client.publish(topicName, name);
                 client.publish(topicEmail, email);
+                client.publish(prefix + 'idioma', 'es');
                 
                 initAudio();
                 startScreen.classList.add('hidden');
