@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanje - Operación Europa 2026</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a;
+            background: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 20px 50px;
+            display: grid;
+            grid-template-columns: 1.2fr 2fr 1fr;
+            align-items: center;
+            border-bottom: 4px solid #00f2ff;
+            box-shadow: 0 5px 25px rgba(0, 242, 255, 0.3);
+        }
+        .logo-sanje { height: 100px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.6)); }
+        .header-titles h1 { font-size: 2.2em; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 10px #00f2ff; }
+        .container { display: grid; grid-template-columns: 1.6fr 1fr; gap: 30px; padding: 40px; max-width: 1500px; margin: 0 auto; }
+        .card { background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(15px); border-radius: 30px; padding: 30px; border: 2px solid rgba(255, 255, 255, 0.2); }
+        .record-card { background: linear-gradient(145deg, rgba(255, 230, 0, 0.2), rgba(255, 100, 0, 0.1)); border: 3px solid #ffd700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.4); text-align: center; }
+        .city-viewer { width: 100%; height: 420px; background: #000; border-radius: 25px; margin: 20px 0; border: 4px solid #00f2ff; overflow: hidden; }
+        #cityImage { width: 100%; height: 100%; object-fit: cover; }
+        .punto-led { position: absolute; width: 20px; height: 20px; background: rgba(255,255,255,0.4); border-radius: 50%; transform: translate(-50%, -50%); }
+        .led-target { background: #ff0055; box-shadow: 0 0 25px #ff0055; animation: pulse 0.7s infinite; }
+        .led-done { background: #39ff14; box-shadow: 0 0 20px #39ff14; }
+        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.5); } }
+        .timer-display { font-size: 4.5em; color: #ff0055; font-family: monospace; font-weight: bold; text-align: center; }
+        #startScreen { position: fixed; inset: 0; background: radial-gradient(circle, #22c1c3 0%, #2d3436 100%); display: flex; justify-content: center; align-items: center; z-index: 10000; }
+        .login-box { background: white; padding: 60px; border-radius: 40px; text-align: center; width: 500px; color: black; }
+        input { width: 100%; padding: 20px; margin-bottom: 25px; border-radius: 15px; border: 3px solid #22c1c3; font-size: 1.2em; text-align: center; }
+        button { padding: 20px; background: #22c1c3; color: white; border: none; font-weight: 900; cursor: pointer; border-radius: 15px; font-size: 1.5em; width: 100%; }
+        .btn-reset { background: #ff4757; font-size: 0.8em; padding: 10px; margin-top: 15px; color: white; border-radius: 10px; border: none; cursor: pointer; }
+        .hidden { display: none !important; }
+
+        .agent-badge {
+            justify-self: end;
+            background: rgba(0, 242, 255, 0.12);
+            border: 2px solid #00f2ff;
+            border-radius: 20px;
+            padding: 12px 25px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+        }
+        .agent-badge span { display: block; font-size: 0.8em; letter-spacing: 3px; color: #00f2ff; }
+        .agent-badge strong { display: block; font-size: 1.8em; text-transform: uppercase; text-shadow: 0 0 10px #00f2ff; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background: url('img/europa.jpg') no-repeat center/contain;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            margin-top: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+    <a href="../index.html?lang=es" style="position:fixed;top:12px;left:12px;z-index:10001;padding:8px 14px;background:rgba(0,0,0,0.45);color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:999px;font:600 14px 'Segoe UI',sans-serif;text-decoration:none;backdrop-filter:blur(6px);">⬅ Menú</a>
+    <div id="startScreen">
+        <div class="login-box">
+            <h1>🌍 OPERACIÓN ESPÍA</h1>
+            <input type="text" id="playerName" placeholder="Nombre de Agente">
+            <button id="startButton">¡COMENZAR!</button>
+            <button onclick="enviarResetTotal()" class="btn-reset">RESETEAR RÉCORDS (SISTEMA)</button>
+        </div>
+    </div>
+    <header>
+        <img src="img/logo.png" class="logo-sanje" onerror="this.src='https://via.placeholder.com/100'">
+        <div class="header-titles"><h1>OPERACIÓN EUROPA</h1><p>IES SANJE - 2026</p></div>
+        <div class="agent-badge"><span>🕵️ AGENTE</span><strong id="agentName">---</strong></div>
+    </header>
+    <div class="container">
+        <div class="card" style="text-align: center;">
+            <div id="imageText" style="font-size: 2.5em; color: #00f2ff; margin-bottom: 10px;">PREPARADO</div>
+            <div class="city-viewer"><img id="cityImage" src="img/imagen0.jpg"></div>
+            <p id="instructionText">Esperando órdenes...</p>
+            <button id="nextButton" class="hidden" style="width:auto; margin-top:20px; padding:15px 40px;">▶ SIGUIENTE AGENTE</button>
+        </div>
+        <div class="side-info">
+            <div class="card record-card">
+                <span style="color:#ffd700; font-weight:900;">🏆 MEJOR AGENTE</span>
+                <div id="bestPlayer" style="font-size: 2em;">---</div>
+                <div id="bestTime" style="color:#ffd700; font-family:monospace; font-size: 1.5em;">00:00.00</div>
+                <button onclick="enviarResetTotal()" class="btn-reset" style="width: auto; padding: 5px 15px;">Reset</button>
+            </div>
+            <div class="card" style="margin-top:20px;">
+                <h3>⏱️ TU TIEMPO</h3>
+                <div id="timer" class="timer-display">00:00.00</div>
+                
+                <div class="map-container">
+                    <div class="punto-led" style="top:75%; left:15%" id="led-1"></div>
+                    <div class="punto-led" style="top:70%; left:45%" id="led-2"></div>
+                    <div class="punto-led" style="top:55%; left:25%" id="led-3"></div>
+                    <div class="punto-led" style="top:80%; left:65%" id="led-4"></div>
+                    <div class="punto-led" style="top:25%; left:42%" id="led-5"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script>
+        const client = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
+        const cityNames = { 1: 'Madrid', 2: 'Roma', 3: 'París', 4: 'Atenas', 5: 'Oslo' };
+        let ruta = [], paso = 0, gameActive = false, startTime = 0, timerLoop, agente = '';
+        const T_GANADOR = 'sanjealcantarilla/espia/ganador';
+        const T_TIEMPO = 'sanjealcantarilla/espia/tiempoganador';
+        const T_RESET = 'sanjealcantarilla/reset/espia';
+        let record = { nombre: '', tiempo: '' };
+
+        // "mm:ss.cc" -> milisegundos (Infinity si no es válido)
+        function tiempoAMs(t) {
+            const m = /^(\d+):(\d{2})\.(\d{2})$/.exec((t || '').trim());
+            return m ? (+m[1] * 60000 + +m[2] * 1000 + +m[3] * 10) : Infinity;
+        }
+
+        function mostrarRecord() {
+            document.getElementById('bestPlayer').innerText = record.nombre || '---';
+            document.getElementById('bestTime').innerText = record.tiempo || '00:00.00';
+            try { localStorage.setItem('espiaRecord', JSON.stringify(record)); } catch (e) {}
+        }
+
+        // Récord local de respaldo (si el broker aún no ha respondido)
+        try {
+            const r = JSON.parse(localStorage.getItem('espiaRecord'));
+            if (r && r.nombre && r.tiempo) record = r;
+        } catch (e) {}
+        mostrarRecord();
+
+        // --- MOTOR DE SONIDO ---
+        let audioCtx = null;
+        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+
+        function playSound(freqs, duration) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            freqs.forEach((f, i) => {
+                osc.frequency.setValueAtTime(f, audioCtx.currentTime + (i * 0.1));
+            });
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        client.on('connect', () => {
+            console.log("Conectado a MQTT");
+            client.subscribe(['sanjealcantarilla/numeros', T_GANADOR, T_TIEMPO, T_RESET]);
+        });
+
+        client.on('message', (topic, message) => {
+            const data = message.toString();
+            
+            // ACTUALIZACIÓN DE RÉCORDS (mensajes retenidos en el broker, compartidos entre pantallas)
+            if (topic === T_GANADOR) { record.nombre = data; mostrarRecord(); }
+            if (topic === T_TIEMPO) { record.tiempo = data; mostrarRecord(); }
+            if (topic === T_RESET) { record = { nombre: '', tiempo: '' }; mostrarRecord(); }
+            
+            // LÓGICA DE JUEGO
+            if (gameActive && topic === 'sanjealcantarilla/numeros' && parseInt(data) === ruta[paso]) {
+                document.getElementById(`led-${ruta[paso]}`).className = 'punto-led led-done';
+                
+                // Sonido de acierto
+                playSound([523.25, 659.25, 783.99], 0.4); 
+                
+                paso++;
+                if (paso < 5) actualizar(); else finalizar();
+            }
+        });
+
+        document.getElementById('startButton').onclick = () => {
+            agente = document.getElementById('playerName').value.trim();
+            if (!agente) {
+                alert("Por favor, introduce tu nombre de agente");
+                return;
+            }
+            agente = agente.slice(0, 3) + '007'; // Nombre en clave: 3 primeras letras + 007
+            document.getElementById('agentName').innerText = agente;
+            initAudio(); // Activa el sistema de sonido tras la interacción
+            document.getElementById('startScreen').classList.add('hidden');
+            
+            // Reiniciar LEDs
+            document.querySelectorAll('.punto-led').forEach(l => l.className = 'punto-led');
+            
+            ruta = [1, 2, 3, 4, 5].sort(() => Math.random() - 0.5);
+            paso = 0; gameActive = true; startTime = Date.now();
+            
+            timerLoop = setInterval(() => {
+                const d = Date.now() - startTime;
+                const m = Math.floor(d/60000).toString().padStart(2,'0'), 
+                      s = Math.floor((d%60000)/1000).toString().padStart(2,'0'), 
+                      ms = Math.floor((d%1000)/10).toString().padStart(2,'0');
+                document.getElementById('timer').innerText = `${m}:${s}.${ms}`;
+            }, 10);
+            actualizar();
+        };
+
+        document.getElementById('playerName').addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('startButton').click();
+        });
+
+        function actualizar() {
+            const id = ruta[paso];
+            document.getElementById('imageText').innerText = `📍 VE A: ${cityNames[id].toUpperCase()}`;
+            document.getElementById('cityImage').src = `img/conexion/set1/imagen${id}.jpg`;
+            document.getElementById('instructionText').innerText = `Agente ${agente}, tu objetivo: encuentra ${cityNames[id]} en el mapa. (${paso + 1}/5)`;
+            document.querySelectorAll('.punto-led').forEach(l => {
+                if(!l.classList.contains('led-done')) l.classList.remove('led-target');
+            });
+            document.getElementById(`led-${id}`).classList.add('led-target');
+        }
+
+        function finalizar() {
+            gameActive = false; 
+            clearInterval(timerLoop);
+            document.getElementById('imageText').innerText = "🏆 ¡VICTORIA!";
+            document.getElementById('imageText').style.color = "#39ff14";
+            document.getElementById('instructionText').innerText =
+                `¡Misión cumplida, agente ${agente}! Tiempo: ${document.getElementById('timer').innerText}`;
+            
+            // Sonido de victoria
+            playSound([523.25, 659.25, 783.99, 1046.50], 0.8);
+            document.getElementById('nextButton').classList.remove('hidden');
+            
+            const payload = {
+                nombre: agente,
+                tiempo: document.getElementById('timer').innerText
+            };
+            client.publish('sanjealcantarilla/espia/tiempo_final', JSON.stringify(payload));
+
+            // ¿Nuevo récord? Se publica retenido para que lo vean todas las pantallas
+            if (tiempoAMs(payload.tiempo) < tiempoAMs(record.tiempo) || !record.nombre) {
+                record = { nombre: payload.nombre, tiempo: payload.tiempo };
+                mostrarRecord();
+                client.publish(T_GANADOR, record.nombre, { retain: true });
+                client.publish(T_TIEMPO, record.tiempo, { retain: true });
+            }
+        }
+
+        // Deja el juego listo para el siguiente jugador sin recargar la página
+        document.getElementById('nextButton').onclick = () => {
+            document.getElementById('nextButton').classList.add('hidden');
+            document.getElementById('imageText').innerText = 'PREPARADO';
+            document.getElementById('imageText').style.color = '#00f2ff';
+            document.getElementById('instructionText').innerText = 'Esperando órdenes...';
+            document.getElementById('cityImage').src = 'img/imagen0.jpg';
+            document.getElementById('timer').innerText = '00:00.00';
+            document.getElementById('agentName').innerText = '---';
+            document.querySelectorAll('.punto-led').forEach(l => l.className = 'punto-led');
+            document.getElementById('playerName').value = '';
+            document.getElementById('startScreen').classList.remove('hidden');
+            document.getElementById('playerName').focus();
+        };
+
+        function enviarResetTotal() {
+            if(confirm("¿Seguro que quieres borrar TODOS los récords del sistema?")) {
+                client.publish(T_RESET, 'reset');
+                // Un mensaje vacío retenido borra el récord guardado en el broker
+                client.publish(T_GANADOR, '', { retain: true });
+                client.publish(T_TIEMPO, '', { retain: true });
+                record = { nombre: '', tiempo: '' };
+                mostrarRecord();
+            }
+        }
+    </script>
+</body>
+</html>

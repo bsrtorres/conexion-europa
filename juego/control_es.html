@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EUROPA - Control de Iluminación</title>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            color: #333;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        h1 { color: #1e3c72; margin-bottom: 20px; font-size: 1.5em; }
+
+        .data-box {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #e0e0e0;
+        }
+
+        #valorLuz {
+            font-size: 3.5em;
+            font-weight: bold;
+            color: #fdbb2d;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .slider-wrapper {
+            margin-top: 30px;
+        }
+
+        input[type=range] {
+            width: 100%;
+            height: 15px;
+            border-radius: 10px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+            margin: 20px 0;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #1e3c72;
+            cursor: pointer;
+            transition: background .3s;
+        }
+
+        .umbral-display {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2a5298;
+        }
+
+        .status {
+            font-size: 0.8em;
+            margin-top: 20px;
+            color: #666;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <a href="../index.html?lang=es" style="position:fixed;top:12px;left:12px;z-index:10001;padding:8px 14px;background:rgba(0,0,0,0.45);color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:999px;font:600 14px 'Segoe UI',sans-serif;text-decoration:none;backdrop-filter:blur(6px);">⬅ Menú</a>
+
+    <div class="container">
+        <h1>💡 Nivel de Luz Ambiente</h1>
+        
+        <div class="data-box">
+            <div id="valorLuz">0</div>
+            <p style="color: #666;">Valor actual del sensor</p>
+        </div>
+
+        <div class="slider-wrapper">
+            <p class="umbral-display">Ajustar Umbral: <span id="labelUmbral">4000</span></p>
+            <input type="range" id="sliderUmbral" min="0" max="10000" step="50" value="4000">
+            <p style="font-size: 0.8em; color: #888;">Desliza para cambiar el límite de activación</p>
+        </div>
+
+        <div id="status" class="status">Conectando al broker MQTT...</div>
+    </div>
+
+    <script>
+        // CONFIGURACIÓN
+        const prefix = 'sanjealcantarilla/';
+        const TOPIC_LUZ = prefix + 'luzambiente';
+        const TOPIC_UMBRAL = prefix + 'umbral';
+
+        // Conexión al broker público
+        const client = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
+
+        const valorLuzDiv = document.getElementById('valorLuz');
+        const slider = document.getElementById('sliderUmbral');
+        const labelUmbral = document.getElementById('labelUmbral');
+        const statusDiv = document.getElementById('status');
+
+        client.on('connect', () => {
+            statusDiv.innerHTML = "🟢 Conectado exitosamente<br><small>Suscrito a: " + prefix + "#</small>";
+            
+            // SUSCRIPCIÓN A AMBOS TÓPICOS
+            client.subscribe([TOPIC_LUZ, TOPIC_UMBRAL], (err) => {
+                if (!err) {
+                    console.log("Suscrito a luz y umbral");
+                }
+            });
+        });
+
+        client.on('message', (topic, message) => {
+            const payload = message.toString();
+            
+            // Lógica según el tópico que llega
+            if (topic === TOPIC_LUZ) {
+                valorLuzDiv.innerText = payload;
+            } 
+            else if (topic === TOPIC_UMBRAL) {
+                // Si el umbral cambia (desde esta web o desde fuera), actualizamos la UI
+                slider.value = payload;
+                labelUmbral.innerText = payload;
+                console.log("Umbral sincronizado:", payload);
+            }
+        });
+
+        // Actualizar etiqueta visual mientras se arrastra (solo local)
+        slider.oninput = function() {
+            labelUmbral.innerText = this.value;
+        };
+
+        // Enviar por MQTT solo al soltar el ratón
+        slider.onchange = function() {
+            const val = this.value;
+            client.publish(TOPIC_UMBRAL, val, { retain: true });
+            console.log("Publicando nuevo umbral:", val);
+        };
+
+        client.on('error', (err) => {
+            statusDiv.innerHTML = "🔴 Error de conexión";
+            console.error(err);
+        });
+
+        client.on('offline', () => {
+            statusDiv.innerHTML = "🟠 El cliente está offline";
+        });
+    </script>
+</body>
+</html>
