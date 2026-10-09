@@ -3,97 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#08164a">
     <title>Entrenamiento – Conexión Europa</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <style>
+        /* ── Paleta "Conexión Europa": azul noche + oro ── */
+        :root {
+            --eu-950: #040a24;
+            --eu-900: #08164a;
+            --eu-800: #0c2170;
+            --eu-600: #1d44c4;
+            --sky: #8fb0ff;
+            --gold: #ffcc00;
+            --gold-soft: #ffe066;
+            --text: #eef2ff;
+            --text-dim: #a3b0d9;
+            --line: rgba(255, 255, 255, 0.12);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; }
         body {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #050510;
-            background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #050510 70%);
-            color: #e2e8f0;
+            font-family: 'Outfit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--eu-950);
+            background-image: radial-gradient(ellipse 90% 60% at 50% 0%, #142a78 0%, var(--eu-950) 70%);
+            color: var(--text);
             display: flex;
             flex-direction: column;
+            height: 100dvh;
         }
 
         /* ── Barra superior ── */
         .top-bar {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.04);
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(4, 10, 36, 0.7);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--line);
+            box-shadow: 0 1px 0 rgba(255, 204, 0, 0.25);
             flex-shrink: 0;
             flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
         }
         .top-bar h1 {
-            font-size: 1em;
-            color: #a78bfa;
+            font-size: 1.05em;
+            font-weight: 700;
+            color: var(--gold-soft);
             white-space: nowrap;
+            margin-right: 6px;
         }
         .badge {
-            background: rgba(96,165,250,0.14);
-            border: 1px solid rgba(96,165,250,0.4);
-            color: #93c5fd;
-            padding: 4px 12px;
-            border-radius: 16px;
+            background: rgba(29, 68, 196, 0.25);
+            border: 1px solid rgba(143, 176, 255, 0.4);
+            color: #c9d7ff;
+            padding: 5px 12px;
+            border-radius: 999px;
             font-size: 0.82em;
             font-weight: 600;
+            font-variant-numeric: tabular-nums;
             white-space: nowrap;
         }
         .spacer { flex: 1; min-width: 10px; }
-        .speed-label { font-size: 0.82em; color: #94a3b8; white-space: nowrap; }
+        .speed-label { font-size: 0.82em; color: var(--text-dim); white-space: nowrap; }
         select#speedSel {
             background: rgba(255,255,255,0.08);
             border: 1px solid rgba(255,255,255,0.2);
-            color: #e2e8f0;
-            padding: 6px 10px;
-            border-radius: 8px;
+            color: var(--text);
+            padding: 7px 10px;
+            border-radius: 10px;
+            font: inherit;
             font-size: 0.85em;
             cursor: pointer;
         }
-        select#speedSel option { background: #0f1535; }
+        select#speedSel:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+        select#speedSel option { background: var(--eu-900); }
 
         .btn {
-            padding: 7px 15px;
+            padding: 8px 15px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
+            font: inherit;
             font-size: 0.88em;
-            font-weight: 600;
-            transition: all 0.2s;
+            font-weight: 700;
+            transition: transform 0.15s, filter 0.2s, background 0.2s;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 5px;
             white-space: nowrap;
+            box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18);
         }
-        .btn:hover:not(:disabled) { opacity: 0.85; transform: translateY(-1px); }
+        .btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
         .btn:active:not(:disabled) { transform: translateY(0); }
-        .btn:disabled { opacity: 0.38; cursor: default; }
-        .btn-green  { background: #22c55e; color: #fff; }
-        .btn-yellow { background: #fbbf24; color: #1e1b1b; }
-        .btn-red    { background: #ef4444; color: #fff; }
-        .btn-ghost  { background: rgba(255,255,255,0.1); color: #e2e8f0; }
+        .btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+        .btn:disabled { opacity: 0.35; cursor: default; }
+        .btn-green  { background: linear-gradient(180deg, #34d77e, #1fae5e); color: #fff; }
+        .btn-yellow { background: linear-gradient(180deg, var(--gold-soft), var(--gold)); color: var(--eu-900); }
+        .btn-red    { background: linear-gradient(180deg, #f2545f, #d93a45); color: #fff; }
+        .btn-ghost  { background: rgba(255,255,255,0.08); color: var(--text); border: 1px solid var(--line); box-shadow: none; }
 
         /* ── Zona de imagen ── */
         .image-area {
             flex: 1;
+            min-height: 0;
             position: relative;
             overflow: hidden;
-            background: #000;
+            background: radial-gradient(ellipse at 50% 40%, #0c1a52 0%, #01030c 75%);
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 18px 18px 150px;
         }
 
         #cityImg {
-            max-width: 70%;
-            max-height: 70%;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.6));
             opacity: 0;
             transition: opacity 0.45s ease;
             display: none;
@@ -104,27 +137,30 @@
         .city-info {
             position: absolute;
             bottom: 0; left: 0; right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.9) 38%);
-            padding: 70px 24px 22px;
+            background: linear-gradient(transparent, rgba(1, 3, 12, 0.92) 40%);
+            padding: 60px 24px 20px;
             text-align: center;
             opacity: 0;
             transition: opacity 0.45s ease;
             pointer-events: none;
             display: none;
         }
-        .city-flag    { font-size: 3.2em; line-height: 1; margin-bottom: 6px; }
+        .city-flag    { font-size: 2.8em; line-height: 1; margin-bottom: 4px; }
         .city-name    {
-            font-size: clamp(2em, 7vh, 5em);
-            font-weight: 900;
+            font-size: clamp(2em, 7vh, 4.6em);
+            font-weight: 800;
             color: #fff;
-            letter-spacing: 1px;
+            letter-spacing: 0.01em;
             text-shadow: 0 2px 16px rgba(0,0,0,0.95);
-            line-height: 1.1;
+            line-height: 1.05;
         }
         .city-country {
-            font-size: clamp(1em, 2.4vh, 1.5em);
-            color: #c4b5fd;
-            font-weight: 500;
+            display: inline-block;
+            font-size: clamp(0.95em, 2.3vh, 1.4em);
+            color: var(--gold-soft);
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
             margin-top: 6px;
             text-shadow: 0 1px 8px rgba(0,0,0,0.9);
         }
@@ -137,53 +173,89 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #050510 75%);
+            background: radial-gradient(ellipse at 50% 40%, #142a78 0%, var(--eu-950) 75%);
             gap: 14px;
             text-align: center;
             padding: 24px;
+            overflow-y: auto;
         }
-        .idle-screen .big-icon { font-size: 5em; filter: drop-shadow(0 0 20px rgba(139,92,246,0.35)); }
+        .idle-screen .big-icon {
+            display: grid;
+            place-items: center;
+            width: 120px;
+            height: 120px;
+            font-size: 4.2em;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(29, 68, 196, 0.45) 0%, rgba(29, 68, 196, 0.05) 70%);
+            border: 2px dashed rgba(255, 204, 0, 0.55);
+            filter: drop-shadow(0 0 24px rgba(29, 68, 196, 0.6));
+        }
         .idle-screen h2   {
-            font-size: 1.8em;
+            font-size: clamp(1.5em, 5vw, 2.2em);
             font-weight: 800;
-            background: linear-gradient(100deg, #93c5fd 0%, #c4b5fd 50%, #93c5fd 100%);
+            background: linear-gradient(100deg, #ffffff 0%, var(--gold-soft) 50%, #ffffff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        .idle-screen p    { color: #94a3b8; font-size: 0.95em; max-width: 460px; line-height: 1.6; }
+        .idle-screen p    { color: var(--text-dim); font-size: 1em; max-width: 480px; line-height: 1.6; }
         .idle-screen .keys {
             margin-top: 8px;
             font-size: 0.82em;
-            color: #64748b;
+            color: #7583ad;
         }
         .key {
             display: inline-block;
             background: rgba(255,255,255,0.08);
             border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 5px;
-            padding: 2px 8px;
-            font-family: monospace;
+            border-bottom-width: 3px;
+            border-radius: 6px;
+            padding: 1px 8px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text);
             margin: 0 2px;
         }
 
         /* ── Barra de progreso del temporizador ── */
         .timer-bar {
-            height: 5px;
+            height: 6px;
             background: rgba(255,255,255,0.06);
             flex-shrink: 0;
         }
         .timer-fill {
             height: 100%;
-            background: linear-gradient(90deg, #3b82f6, #a78bfa);
+            background: linear-gradient(90deg, var(--eu-600), var(--sky) 60%, var(--gold));
+            box-shadow: 0 0 12px rgba(255, 204, 0, 0.5);
             width: 0%;
         }
 
+        /* ── Móvil: foto a todo el ancho ── */
         @media (max-width: 640px) {
+            .top-bar { padding: 8px 8px; gap: 6px; justify-content: center; }
             .top-bar h1 { display: none; }
             .speed-label { display: none; }
-            select#speedSel { font-size: 0.78em; padding: 5px 6px; }
-            .btn { padding: 6px 10px; font-size: 0.82em; gap: 3px; }
+            .spacer { display: none; }
+            select#speedSel { font-size: 0.8em; padding: 8px 6px; }
+            .btn { padding: 9px 11px; font-size: 0.82em; gap: 3px; }
+
+            .image-area { padding: 8px 4px 130px; align-items: center; }
+            #cityImg {
+                width: 100%;
+                height: 100%;
+            }
+            .city-info { padding: 40px 12px 14px; }
+            .city-flag { font-size: 2.2em; }
+            .city-name { font-size: clamp(1.9em, 10vw, 3em); }
+            .idle-screen .big-icon { width: 96px; height: 96px; font-size: 3.4em; }
+            .idle-screen .keys { display: none; }
+        }
+
+        /* Móvil en horizontal: aprovechar la altura para la foto */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .image-area { padding: 6px 6px 90px; }
+            .city-info { padding: 30px 12px 8px; }
+            .city-flag { display: none; }
+            .city-name { font-size: 1.8em; }
         }
 
         @media (prefers-reduced-motion: reduce) {

@@ -3,72 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#08164a">
     <title>Sanje - Operazione Europa 2026</title>
     <style>
+        /* ── Operación Espía: azul noche europeo + cian "radar" + oro de récord ── */
+        :root {
+            --night-950: #030817;
+            --night-900: #071030;
+            --night-800: #0c1a4a;
+            --cyan: #00f2ff;
+            --cyan-dim: rgba(0, 242, 255, 0.35);
+            --gold: #ffcc00;
+            --pink: #ff0055;
+            --lime: #39ff14;
+            --text: #eaf6ff;
+            --text-dim: #9fb3d9;
+            --glass: rgba(255, 255, 255, 0.06);
+            --line: rgba(255, 255, 255, 0.14);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0f172a;
-            background: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%);
+            font-family: 'Outfit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--night-950);
+            background-image:
+                linear-gradient(rgba(0, 242, 255, 0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.035) 1px, transparent 1px),
+                radial-gradient(ellipse 80% 60% at 50% 0%, #13286e 0%, var(--night-900) 55%, var(--night-950) 100%);
+            background-size: 40px 40px, 40px 40px, 100% 100%;
+            background-attachment: fixed;
             min-height: 100vh;
-            color: white;
+            color: var(--text);
             overflow-x: hidden;
         }
         header {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(3, 8, 23, 0.55);
             backdrop-filter: blur(20px);
-            padding: 20px 50px;
+            -webkit-backdrop-filter: blur(20px);
+            padding: 18px 50px 18px 130px;
             display: grid;
             grid-template-columns: 1.2fr 2fr 1fr;
             align-items: center;
-            border-bottom: 4px solid #00f2ff;
-            box-shadow: 0 5px 25px rgba(0, 242, 255, 0.3);
+            gap: 16px;
+            border-bottom: 2px solid var(--cyan);
+            box-shadow: 0 6px 30px rgba(0, 242, 255, 0.22);
         }
-        .logo-sanje { height: 100px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.6)); }
-        .header-titles h1 { font-size: 2.2em; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 10px #00f2ff; }
-        .container { display: grid; grid-template-columns: 1.6fr 1fr; gap: 30px; padding: 40px; max-width: 1500px; margin: 0 auto; }
-        .card { background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(15px); border-radius: 30px; padding: 30px; border: 2px solid rgba(255, 255, 255, 0.2); }
-        .record-card { background: linear-gradient(145deg, rgba(255, 230, 0, 0.2), rgba(255, 100, 0, 0.1)); border: 3px solid #ffd700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.4); text-align: center; }
-        .city-viewer { width: 100%; height: 420px; background: #000; border-radius: 25px; margin: 20px 0; border: 4px solid #00f2ff; overflow: hidden; }
-        #cityImage { width: 100%; height: 100%; object-fit: cover; }
-        .punto-led { position: absolute; width: 20px; height: 20px; background: rgba(255,255,255,0.4); border-radius: 50%; transform: translate(-50%, -50%); }
-        .led-target { background: #ff0055; box-shadow: 0 0 25px #ff0055; animation: pulse 0.7s infinite; }
-        .led-done { background: #39ff14; box-shadow: 0 0 20px #39ff14; }
+        .logo-sanje {
+            height: 90px;
+            width: auto;
+            background: #fff;
+            padding: 8px 12px;
+            border-radius: 16px;
+            box-shadow: 0 0 0 2px var(--cyan-dim), 0 0 24px rgba(0, 242, 255, 0.35);
+        }
+        .header-titles { text-align: center; }
+        .header-titles h1 {
+            font-size: 2.2em;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            text-shadow: 0 0 14px rgba(0, 242, 255, 0.8);
+        }
+        .header-titles p {
+            margin-top: 4px;
+            font-size: 0.85em;
+            letter-spacing: 0.4em;
+            color: var(--cyan);
+            opacity: 0.85;
+        }
+        .container { display: grid; grid-template-columns: 1.6fr 1fr; gap: 28px; padding: 36px 40px; max-width: 1500px; margin: 0 auto; }
+        .side-info { min-width: 0; }
+        .card {
+            position: relative;
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 26px;
+            padding: 28px;
+            border: 1px solid var(--line);
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+        .card h3 {
+            font-size: 0.95em;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            color: var(--text-dim);
+            text-align: center;
+            margin-bottom: 6px;
+        }
+        #imageText {
+            font-size: 2.4em;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 18px currentColor;
+        }
+        #instructionText { font-size: 1.2em; color: var(--text-dim); line-height: 1.5; }
+        .record-card {
+            background: linear-gradient(145deg, rgba(255, 204, 0, 0.18), rgba(255, 120, 0, 0.06));
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 34px rgba(255, 204, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            text-align: center;
+        }
+        #bestPlayer { font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; margin: 6px 0 2px; overflow-wrap: anywhere; }
+        .city-viewer {
+            position: relative;
+            width: 100%;
+            height: 440px;
+            background: #000;
+            border-radius: 22px;
+            margin: 18px 0;
+            border: 3px solid var(--cyan);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.3), inset 0 0 40px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+        }
+        /* Esquinas de "visor" */
+        .city-viewer::after {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            pointer-events: none;
+            background:
+                linear-gradient(var(--cyan), var(--cyan)) top left / 28px 3px,
+                linear-gradient(var(--cyan), var(--cyan)) top left / 3px 28px,
+                linear-gradient(var(--cyan), var(--cyan)) top right / 28px 3px,
+                linear-gradient(var(--cyan), var(--cyan)) top right / 3px 28px,
+                linear-gradient(var(--cyan), var(--cyan)) bottom left / 28px 3px,
+                linear-gradient(var(--cyan), var(--cyan)) bottom left / 3px 28px,
+                linear-gradient(var(--cyan), var(--cyan)) bottom right / 28px 3px,
+                linear-gradient(var(--cyan), var(--cyan)) bottom right / 3px 28px;
+            background-repeat: no-repeat;
+            opacity: 0.9;
+        }
+        #cityImage { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .punto-led { position: absolute; width: 20px; height: 20px; background: rgba(255,255,255,0.45); border: 2px solid rgba(255,255,255,0.7); border-radius: 50%; transform: translate(-50%, -50%); }
+        .led-target { background: var(--pink); border-color: #fff; box-shadow: 0 0 25px var(--pink); animation: pulse 0.7s infinite; }
+        .led-done { background: var(--lime); border-color: #fff; box-shadow: 0 0 20px var(--lime); }
         @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.5); } }
-        .timer-display { font-size: 4.5em; color: #ff0055; font-family: monospace; font-weight: bold; text-align: center; }
-        #startScreen { position: fixed; inset: 0; background: radial-gradient(circle, #22c1c3 0%, #2d3436 100%); display: flex; justify-content: center; align-items: center; z-index: 10000; }
-        .login-box { background: white; padding: 60px; border-radius: 40px; text-align: center; width: 500px; color: black; }
-        input { width: 100%; padding: 20px; margin-bottom: 25px; border-radius: 15px; border: 3px solid #22c1c3; font-size: 1.2em; text-align: center; }
-        button { padding: 20px; background: #22c1c3; color: white; border: none; font-weight: 900; cursor: pointer; border-radius: 15px; font-size: 1.5em; width: 100%; }
-        .btn-reset { background: #ff4757; font-size: 0.8em; padding: 10px; margin-top: 15px; color: white; border-radius: 10px; border: none; cursor: pointer; }
+        .timer-display {
+            font-size: 4.2em;
+            color: var(--pink);
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-variant-numeric: tabular-nums;
+            font-weight: 800;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(255, 0, 85, 0.55);
+        }
+        #startScreen {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 55% at 50% 30%, rgba(0, 242, 255, 0.22) 0%, transparent 70%),
+                linear-gradient(180deg, #0c1a4a 0%, var(--night-950) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 16px;
+            overflow-y: auto;
+            z-index: 10000;
+        }
+        .login-box {
+            background: #fff;
+            padding: 50px 46px;
+            border-radius: 32px;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            color: var(--night-900);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 0 4px var(--cyan-dim), 0 0 60px rgba(0, 242, 255, 0.3);
+        }
+        .login-box h1 { font-size: clamp(1.6em, 6vw, 2.2em); font-weight: 800; letter-spacing: 0.06em; margin-bottom: 26px; }
+        input {
+            width: 100%;
+            padding: 18px;
+            margin-bottom: 20px;
+            border-radius: 14px;
+            border: 2px solid #cfe9ee;
+            background: #f4fbfd;
+            font: inherit;
+            font-size: 1.2em;
+            text-align: center;
+            color: var(--night-900);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        input:focus { outline: none; border-color: #00b8c4; box-shadow: 0 0 0 4px rgba(0, 242, 255, 0.2); }
+        button {
+            padding: 18px;
+            background: linear-gradient(180deg, #19e3ef 0%, #00b8c4 100%);
+            color: var(--night-950);
+            border: none;
+            font: inherit;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            cursor: pointer;
+            border-radius: 14px;
+            font-size: 1.4em;
+            width: 100%;
+            box-shadow: 0 10px 26px rgba(0, 184, 196, 0.4), inset 0 -3px 0 rgba(0, 0, 0, 0.15);
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(0, 184, 196, 0.5), inset 0 -3px 0 rgba(0, 0, 0, 0.15); }
+        button:active { transform: translateY(1px); }
+        .btn-reset {
+            background: transparent;
+            font-size: 0.75em;
+            font-weight: 700;
+            padding: 10px;
+            margin-top: 14px;
+            color: #e0284f;
+            border-radius: 10px;
+            border: 1px solid rgba(224, 40, 79, 0.45);
+            box-shadow: none;
+            cursor: pointer;
+        }
+        .btn-reset:hover { background: rgba(224, 40, 79, 0.1); box-shadow: none; }
+        .record-card .btn-reset { color: #ff8099; border-color: rgba(255, 128, 153, 0.45); margin-top: 12px; }
         .hidden { display: none !important; }
 
         .agent-badge {
             justify-self: end;
-            background: rgba(0, 242, 255, 0.12);
-            border: 2px solid #00f2ff;
-            border-radius: 20px;
-            padding: 12px 25px;
+            background: rgba(0, 242, 255, 0.08);
+            border: 1px solid var(--cyan);
+            border-radius: 18px;
+            padding: 10px 22px;
             text-align: center;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+            box-shadow: 0 0 22px rgba(0, 242, 255, 0.25), inset 0 0 18px rgba(0, 242, 255, 0.08);
+            min-width: 0;
         }
-        .agent-badge span { display: block; font-size: 0.8em; letter-spacing: 3px; color: #00f2ff; }
-        .agent-badge strong { display: block; font-size: 1.8em; text-transform: uppercase; text-shadow: 0 0 10px #00f2ff; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .agent-badge span { display: block; font-size: 0.75em; letter-spacing: 0.25em; color: var(--cyan); }
+        .agent-badge strong { display: block; font-size: 1.7em; text-transform: uppercase; text-shadow: 0 0 10px var(--cyan); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         .map-container {
             position: relative;
             width: 100%;
             height: 300px;
             background: url('img/europa.jpg') no-repeat center/contain;
-            background-color: rgba(255,255,255,0.05);
-            border-radius: 20px;
+            background-color: rgba(0, 242, 255, 0.04);
+            border-radius: 18px;
             margin-top: 15px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+        }
+
+        /* Botón "⬅ Menú" */
+        .btn-menu {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 10001;
+            padding: 8px 16px;
+            background: rgba(3, 8, 23, 0.65);
+            color: #fff;
+            border: 1px solid var(--cyan-dim);
+            border-radius: 999px;
+            font: 600 14px 'Outfit', 'Segoe UI', sans-serif;
+            text-decoration: none;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            transition: background 0.2s ease;
+        }
+        .btn-menu:hover { background: rgba(0, 242, 255, 0.2); }
+
+        /* ── Tablet ── */
+        @media (max-width: 1024px) {
+            .container { grid-template-columns: 1fr; padding: 24px 20px; }
+            header { grid-template-columns: auto 1fr auto; padding: 16px 20px 16px 120px; }
+            .logo-sanje { height: 70px; }
+            .header-titles h1 { font-size: 1.6em; }
+        }
+
+        /* ── Móvil: la foto de la ciudad ocupa todo el ancho ── */
+        @media (max-width: 640px) {
+            header {
+                grid-template-columns: auto 1fr;
+                padding: 56px 12px 12px;
+                gap: 10px;
+            }
+            .logo-sanje { height: 54px; padding: 5px 8px; border-radius: 12px; }
+            .header-titles { text-align: right; }
+            .header-titles h1 { font-size: 1.15em; letter-spacing: 0.08em; }
+            .header-titles p { font-size: 0.7em; letter-spacing: 0.25em; }
+            .agent-badge { grid-column: 1 / -1; justify-self: stretch; padding: 8px 14px; }
+            .agent-badge strong { font-size: 1.3em; max-width: none; }
+
+            .container { padding: 12px 8px; gap: 14px; }
+            .card { padding: 16px 10px; border-radius: 20px; }
+            #imageText { font-size: 1.5em; }
+            .city-viewer {
+                height: auto;
+                aspect-ratio: 4 / 3;
+                max-height: 75vh;
+                margin: 12px 0;
+                border-width: 2px;
+                border-radius: 14px;
+            }
+            #instructionText { font-size: 1.05em; padding: 0 6px; }
+            .timer-display { font-size: 2.8em; }
+            .map-container { height: 220px; }
+            .login-box { padding: 34px 22px; border-radius: 24px; }
+            button { font-size: 1.2em; }
         }
     </style>
 </head>
 <body>
-    <a href="../index.html?lang=it" style="position:fixed;top:12px;left:12px;z-index:10001;padding:8px 14px;background:rgba(0,0,0,0.45);color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:999px;font:600 14px 'Segoe UI',sans-serif;text-decoration:none;backdrop-filter:blur(6px);">⬅ Menu</a>
+    <a href="../index.html?lang=it" class="btn-menu">⬅ Menu</a>
     <div id="startScreen">
         <div class="login-box">
             <h1>🌍 OPERAZIONE SPIA</h1>
@@ -84,7 +324,7 @@
     </header>
     <div class="container">
         <div class="card" style="text-align: center;">
-            <div id="imageText" style="font-size: 2.5em; color: #00f2ff; margin-bottom: 10px;">PRONTO</div>
+            <div id="imageText" style="color: #00f2ff;">PRONTO</div>
             <div class="city-viewer"><img id="cityImage" src="img/imagen0.jpg"></div>
             <p id="instructionText">In attesa di ordini...</p>
             <button id="nextButton" class="hidden" style="width:auto; margin-top:20px; padding:15px 40px;">▶ PROSSIMO AGENTE</button>
