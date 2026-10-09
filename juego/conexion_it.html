@@ -355,6 +355,13 @@
             font-variant-numeric: tabular-nums;
         }
 
+        /* Ciudades descubiertas: debajo de la foto, mismo ancho que ella */
+        .cities-card {
+            width: 100%;
+            max-width: 860px;
+            margin-top: 22px;
+        }
+
         #numbers {
             list-style: none;
             display: flex;
@@ -702,6 +709,11 @@
 
                 <div id="bottomText" class="pulse">👀 Presta molta attenzione</div>
             </div>
+
+            <div class="info-card cities-card">
+                <h3>🌆 Città Scoperte</h3>
+                <ul id="numbers"></ul>
+            </div>
         </div>
 
         <div id="infoContainer">
@@ -734,11 +746,6 @@
             <div class="info-card">
                 <h3>🥇 Top 5 migliori</h3>
                 <ol id="top5List" class="top5"><li class="top5-empty">Ancora nessun risultato</li></ol>
-            </div>
-
-            <div class="info-card">
-                <h3>🌆 Città Scoperte</h3>
-                <ul id="numbers"></ul>
             </div>
         </div>
     </div>
