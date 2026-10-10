@@ -465,7 +465,7 @@
             backdrop-filter: blur(6px);
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             padding: 20px 16px;
             overflow-y: auto;
@@ -474,6 +474,8 @@
         }
 
         #startScreen.hidden { display: none; }
+        #startScreen > :first-child { margin-top: auto; }
+        #startScreen > :last-child { margin-bottom: auto; }
 
         #startScreen h2 {
             color: white;
@@ -561,6 +563,74 @@
 
         #startButton:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(255, 204, 0, 0.5), inset 0 -3px 0 rgba(0, 0, 0, 0.12); }
         #startButton:active { transform: translateY(1px); }
+
+        /* ── Cola de inscripciones (llegan desde inscripcion_xx.html) ── */
+        .cola-panel {
+            background: var(--paper);
+            color: var(--ink);
+            padding: 22px 24px;
+            border-radius: 24px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), 0 0 0 4px rgba(255, 204, 0, 0.35);
+            max-width: 480px;
+            width: 100%;
+            margin-bottom: 22px;
+            animation: fadeIn 0.6s ease-in;
+        }
+        .cola-panel h3 {
+            color: var(--eu-800);
+            font-size: 1.15em;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cola-panel .badge { background: var(--eu-700); color: #fff; border-radius: 999px; padding: 2px 12px; font-size: 0.85em; }
+        .cola { list-style: none; display: flex; flex-direction: column; gap: 6px; max-height: 210px; overflow-y: auto; }
+        .cola li {
+            display: grid;
+            grid-template-columns: 30px 1fr auto auto;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 8px 7px 7px;
+            background: #f5f7fd;
+            border: 1px solid #e3e8f6;
+            border-radius: 12px;
+        }
+        .cola li:first-child { background: #fff7d1; border-color: rgba(255, 204, 0, 0.7); }
+        .cola .pos { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--eu-700); color: #fff; font-weight: 800; font-size: 0.9em; }
+        .cola li:first-child .pos { background: var(--gold); color: var(--eu-900); }
+        .cola .nombre { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .cola .quitar { border: none; background: none; color: #8590b5; font-size: 1.1em; cursor: pointer; padding: 2px 6px; border-radius: 8px; }
+        .cola .quitar:hover { color: var(--red); background: #fde8ea; }
+        .cola .vacia { display: block; text-align: center; color: var(--ink-dim); background: none; border: none; }
+        #nextButton {
+            width: 100%;
+            margin-top: 14px;
+            background: linear-gradient(180deg, #4be08f 0%, var(--green) 100%);
+            color: #06341c;
+            border: none;
+            padding: 16px;
+            font: inherit;
+            font-size: 1.25em;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            border-radius: 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            box-shadow: 0 8px 22px rgba(47, 210, 122, 0.35), inset 0 -3px 0 rgba(0, 0, 0, 0.12);
+            transition: transform 0.15s ease, opacity 0.2s ease;
+        }
+        #nextButton:hover { transform: translateY(-2px); }
+        #nextButton:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+        #startScreen p.manual-hint { font-size: 0.95em; margin: 0 0 10px; }
+        .cola-qr { display: flex; justify-content: center; gap: 18px; margin-bottom: 14px; }
+        .cola-qr figure { text-align: center; }
+        .cola-qr img { width: 110px; height: 110px; display: block; border-radius: 10px; border: 1px solid #e3e8f6; }
+        .cola-qr figcaption { font-size: 0.85em; font-weight: 700; color: var(--ink-dim); margin-top: 4px; }
 
         /* ── Top 5 ── */
         .top5 { list-style: none; display: flex; flex-direction: column; gap: 8px; }
@@ -662,6 +732,18 @@
         <h2>🌍 DESCUBRE EUROPA 🌍</h2>
         <p>Prepárate para identificar las ciudades europeas</p>
         
+        <div class="cola-panel">
+            <h3>⏳ Cola de espera <span class="badge" id="colaTotal">0</span></h3>
+            <div class="cola-qr">
+                <figure><img src="img/qr_inscripcion_es.png" alt="QR inscripción español"><figcaption>🇪🇸 Español</figcaption></figure>
+                <figure><img src="img/qr_inscripcion_it.png" alt="QR iscrizione italiano"><figcaption>🇮🇹 Italiano</figcaption></figure>
+            </div>
+            <p class="manual-hint" style="color: var(--ink-dim); text-align: center;">📱 Escanea y apúntate</p>
+            <ul class="cola" id="cola"></ul>
+            <button id="nextButton" disabled>▶ Siguiente</button>
+        </div>
+        <p class="manual-hint">… o inscripción manual:</p>
+
         <div class="register-form">
             <div class="form-group">
                 <label for="playerName">👤 Nombre</label>
@@ -819,21 +901,75 @@
             return isValid;
         }
 
+        function empezarPartida(name, email, idioma) {
+            if (gameStarted) return;
+            // Publicar datos con el prefijo
+            client.publish(topicName, name);
+            client.publish(topicEmail, email);
+            client.publish(prefix + 'idioma', idioma);
+
+            initAudio();
+            startScreen.classList.add('hidden');
+            gameStarted = true;
+        }
+
         startButton.addEventListener('click', () => {
             if (validateForm()) {
-                const name = playerNameInput.value.trim();
-                const email = playerEmailInput.value.trim();
-                
-                // Publicar datos con el prefijo
-                client.publish(topicName, name);
-                client.publish(topicEmail, email);
-                client.publish(prefix + 'idioma', 'es');
-                
-                initAudio();
-                startScreen.classList.add('hidden');
-                gameStarted = true;
+                empezarPartida(playerNameInput.value.trim(), playerEmailInput.value.trim(), 'es');
             }
         });
+
+        // ── Cola de inscripciones ──
+        // Cada alumno inscrito es un mensaje retenido en cola/<id>; al pasar a jugar se borra (payload vacío retenido)
+        const TOPIC_COLA = prefix + 'cola/';
+        const cola = new Map();
+        const colaUl = document.getElementById('cola');
+        const colaTotal = document.getElementById('colaTotal');
+        const nextButton = document.getElementById('nextButton');
+
+        function colaOrdenada() {
+            return [...cola.values()].sort((a, b) => a.t - b.t);
+        }
+
+        function quitarDeCola(id) {
+            cola.delete(id);
+            client.publish(TOPIC_COLA + id, '', { retain: true, qos: 1 });
+            pintarCola();
+        }
+
+        function pintarCola() {
+            const lista = colaOrdenada();
+            colaTotal.textContent = lista.length;
+            nextButton.disabled = lista.length === 0;
+            nextButton.textContent = lista.length ? `▶ Siguiente: ${lista[0].nombre}` : '▶ Siguiente';
+            colaUl.innerHTML = '';
+            if (lista.length === 0) {
+                const li = document.createElement('li');
+                li.className = 'vacia';
+                li.textContent = 'No hay nadie en la cola';
+                colaUl.appendChild(li);
+                return;
+            }
+            lista.forEach((j, i) => {
+                const li = document.createElement('li');
+                const pos = document.createElement('span'); pos.className = 'pos'; pos.textContent = i + 1;
+                const nom = document.createElement('span'); nom.className = 'nombre'; nom.textContent = j.nombre;
+                const ban = document.createElement('span'); ban.textContent = j.idioma === 'it' ? '🇮🇹' : '🇪🇸';
+                const x = document.createElement('button'); x.className = 'quitar'; x.textContent = '✕'; x.title = 'Quitar de la cola';
+                x.addEventListener('click', () => { if (confirm(`Quitar de la cola: ${j.nombre}?`)) quitarDeCola(j.id); });
+                li.append(pos, nom, ban, x);
+                colaUl.appendChild(li);
+            });
+        }
+
+        nextButton.addEventListener('click', () => {
+            const siguiente = colaOrdenada()[0];
+            if (!siguiente || gameStarted) return;
+            quitarDeCola(siguiente.id);
+            empezarPartida(siguiente.nombre, siguiente.email, siguiente.idioma || 'es');
+        });
+
+        pintarCola();
 
         // Lógica de Sonido
         function initAudio() {
@@ -979,11 +1115,20 @@
         client.on('connect', () => {
             console.log('Conectado a EMQX Broker');
             client.subscribe([topicNumbers, topicName, topicWinner, topicWinnerScore, topicTop5]);
+            client.subscribe(TOPIC_COLA + '+', { qos: 1 });
         });
 
         client.on('message', (topic, message) => {
             const payload = message.toString();
             
+            if (topic.startsWith(TOPIC_COLA)) {
+                const id = topic.slice(TOPIC_COLA.length);
+                if (payload === '') cola.delete(id);
+                else { try { cola.set(id, JSON.parse(payload)); } catch (e) {} }
+                pintarCola();
+                return;
+            }
+
             if (topic === topicName) {
                 messageDiv.innerText = `🎮 ${payload} en juego!!!`;
                 if (gameStarted && !imagesDisplayed) {
