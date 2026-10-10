@@ -953,12 +953,27 @@
             });
         }
 
+        const IDIOMA_PAGINA = 'it';
+
         nextButton.addEventListener('click', () => {
             const siguiente = colaOrdenada()[0];
             if (!siguiente || gameStarted) return;
+            const idioma = siguiente.idioma || IDIOMA_PAGINA;
+            if (idioma !== IDIOMA_PAGINA) {
+                // Le toca a alguien del otro idioma: abrir su página del juego, que lo saca de la cola y arranca la partida
+                location.href = `conexion_${idioma}.html#jugar=` + encodeURIComponent(JSON.stringify(siguiente));
+                return;
+            }
             quitarDeCola(siguiente.id);
-            empezarPartida(siguiente.nombre, siguiente.email, siguiente.idioma || 'it');
+            empezarPartida(siguiente.nombre, siguiente.email, idioma);
         });
+
+        // Si venimos de la página del otro idioma con un jugador pendiente (#jugar=...), arrancar al conectar
+        let jugadorPendiente = null;
+        if (location.hash.startsWith('#jugar=')) {
+            try { jugadorPendiente = JSON.parse(decodeURIComponent(location.hash.slice(7))); } catch (e) {}
+            history.replaceState(null, '', location.pathname + location.search); // que recargar no repita la partida
+        }
 
         pintarCola();
 
@@ -1107,6 +1122,12 @@
             console.log('Conectado a EMQX Broker');
             client.subscribe([topicNumbers, topicName, topicWinner, topicWinnerScore, topicTop5]);
             client.subscribe(TOPIC_COLA + '+', { qos: 1 });
+            if (jugadorPendiente) {
+                const j = jugadorPendiente;
+                jugadorPendiente = null;
+                quitarDeCola(j.id);
+                empezarPartida(j.nombre, j.email, IDIOMA_PAGINA);
+            }
         });
 
         client.on('message', (topic, message) => {
