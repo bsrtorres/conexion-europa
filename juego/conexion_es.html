@@ -827,7 +827,7 @@
         <p>© 2025 Sanje - Juego Educativo EUROPA | Departamento de Electricidad-Electrónica</p>
     </footer>
 
-    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script src="https://unpkg.com/mqtt@5.16.0/dist/mqtt.min.js"></script>
     <script>
         // Inclinación del título 3D siguiendo al ratón
         const sign3d = document.getElementById('sign3d');
@@ -1046,15 +1046,27 @@
             }
         }
 
+        // Puntuación: PUNTOS_MAX hasta T_RAPIDO segundos, baja en línea recta
+        // hasta PUNTOS_MIN en T_LENTO segundos y a partir de ahí se queda en PUNTOS_MIN
+        // (quien termina nunca se va con 0)
+        const PUNTOS_MAX = 1000, PUNTOS_MIN = 100;
+        const T_RAPIDO = 15, T_LENTO = 120;
+
+        function calcularPuntos(segundos) {
+            if (segundos <= T_RAPIDO) return PUNTOS_MAX;
+            if (segundos >= T_LENTO) return PUNTOS_MIN;
+            const fraccion = (segundos - T_RAPIDO) / (T_LENTO - T_RAPIDO);
+            return Math.round(PUNTOS_MAX - fraccion * (PUNTOS_MAX - PUNTOS_MIN));
+        }
+
         function stopTimer() {
             if (timerStarted) {
                 clearInterval(interval);
                 timerStarted = false;
                 const elapsedTime = Date.now() - startTime;
                 const totalSeconds = elapsedTime / 1000;
-                
-                let points = totalSeconds > 180 ? 0 : Math.round((1000 * (180 - (totalSeconds*4))) / 175);
-                if(points < 0) points = 0;
+
+                const points = calcularPuntos(totalSeconds);
 
                 scoreDiv.innerText = `🎯 Puntuación: ${points} puntos`;
                 const formattedTime = formatTime(elapsedTime);
