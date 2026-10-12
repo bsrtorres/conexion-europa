@@ -1046,17 +1046,13 @@
             }
         }
 
-        // Puntuación: PUNTOS_MAX hasta T_RAPIDO segundos, baja en línea recta
-        // hasta PUNTOS_MIN en T_LENTO segundos y a partir de ahí se queda en PUNTOS_MIN
-        // (quien termina nunca se va con 0)
+        // Puntuación lineal: PUNTOS_MAX en el segundo 0 y se pierden PUNTOS_POR_SEGUNDO
+        // cada segundo, sin bajar nunca de PUNTOS_MIN (quien termina nunca se va con 0)
         const PUNTOS_MAX = 1000, PUNTOS_MIN = 100;
-        const T_RAPIDO = 15, T_LENTO = 120;
+        const PUNTOS_POR_SEGUNDO = 15; // con 15 se llega al mínimo a los 60 s
 
         function calcularPuntos(segundos) {
-            if (segundos <= T_RAPIDO) return PUNTOS_MAX;
-            if (segundos >= T_LENTO) return PUNTOS_MIN;
-            const fraccion = (segundos - T_RAPIDO) / (T_LENTO - T_RAPIDO);
-            return Math.round(PUNTOS_MAX - fraccion * (PUNTOS_MAX - PUNTOS_MIN));
+            return Math.max(PUNTOS_MIN, Math.round(PUNTOS_MAX - PUNTOS_POR_SEGUNDO * segundos));
         }
 
         function stopTimer() {
